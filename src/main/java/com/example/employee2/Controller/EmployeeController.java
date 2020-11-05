@@ -1,8 +1,11 @@
 package com.example.employee2.Controller;
 
 import com.example.employee2.Model.Employee;
+import com.example.employee2.Model.ErrorResponse;
 import com.example.employee2.Services.EmployeeService;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,7 +13,8 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/v1/Employee")
+@RequestMapping("/api/v1/employee")
+
 public class EmployeeController {
 
     @Autowired
@@ -21,29 +25,39 @@ public class EmployeeController {
         return "Hello Netto";
     }
 
-    @PostMapping("/add")
-    public String addEmployee(@RequestBody Employee employee){
-        employeeService.addEmployee(employee);
-        return "insert complete";
+    @PostMapping
+    public ResponseEntity addEmployee(@RequestBody Employee employee){
+        try {
+            employeeService.addEmployee(employee);
+            return ResponseEntity.ok("success");
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+        }
     }
 
-    @GetMapping("/getall")
+    @GetMapping
     public List<Employee> allEmployee(){
         return employeeService.allEmployee();
     }
 
-    @DeleteMapping("/delete/")
-    public String deleteEmployee(@RequestParam(value="id")long id) {
+    @DeleteMapping("/{id}")
+    public String deleteEmployee(@PathVariable long id) {
         employeeService.deleteEmployee(id);
         return "delete complete";
     }
 
-    @GetMapping("/find/")
-    public Optional<Employee> findIdEmployee(@RequestParam(value="id")long id){
-        return employeeService.findIdEmployee(id);
+    @GetMapping("/{id}")
+    //Optional<Employee>
+    public ResponseEntity findIdEmployee(@PathVariable long id) throws Exception {
+        try {
+            employeeService.findIdEmployee(id);
+            return ResponseEntity.ok(employeeService.findIdEmployee(id));
+        }catch (NotFoundException ex){
+            return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+        }
     }
 
-    @PutMapping("/put")
+    @PutMapping
     public String putEmployee(@RequestBody Employee employee) {
         employeeService.putEmployee(employee);
         return "update complete";
