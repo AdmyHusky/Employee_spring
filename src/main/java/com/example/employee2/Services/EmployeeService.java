@@ -32,7 +32,8 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
-    public void deleteEmployee(long id) {
+    public void deleteEmployee(long id) throws Exception {
+        findIdEmployee(id);
         employeeRepository.deleteById(id);
     }
 
@@ -57,9 +58,15 @@ public class EmployeeService {
         //return ResponseEntity.ok(employeeRepository.findById(id));
     }
 
-    public void putEmployee(Employee employee) {
-        Employee emp = new Employee();
-        emp = employee;
+    public void putEmployee(Employee employee) throws Exception {
+        findIdEmployee(employee.getId());
+        if(employee.getfName()== null || employee.getfName().isEmpty()){
+            throw new Exception("first name must be null");
+        }else if(employee.getlName()== null || employee.getlName().isEmpty()){
+            throw new Exception("last name must be null");
+        }else if(employee.getAge()<=0){
+            throw new Exception("Age is a positive integer");
+        }
         employeeRepository.save(employee);
     }
 }

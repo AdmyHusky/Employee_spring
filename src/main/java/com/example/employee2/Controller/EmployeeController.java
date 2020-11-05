@@ -41,7 +41,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteEmployee(@PathVariable long id) {
+    public String deleteEmployee(@PathVariable long id) throws Exception {
         employeeService.deleteEmployee(id);
         return "delete complete";
     }
@@ -58,9 +58,14 @@ public class EmployeeController {
     }
 
     @PutMapping
-    public String putEmployee(@RequestBody Employee employee) {
-        employeeService.putEmployee(employee);
-        return "update complete";
+    public ResponseEntity putEmployee(@RequestBody Employee employee) throws Exception {
+        try {
+            employeeService.putEmployee(employee);
+            return ResponseEntity.ok("update complete");
+            //return "update complete";
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+        }
     }
 
 }
